@@ -51,8 +51,9 @@ class CameraInterface :
     
     def start_camera(self , callback) :  
         while self._run_cam :
-            ret , frame = self.videoCapture.read() 
+            ret , frame = self.videoCapture.read()  
             if ret == True :    
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) 
                 if callback is not None : 
                     callback(frame)
             if ret == False or (cv2.waitKey(1) & 0xFF == ord('q')): break

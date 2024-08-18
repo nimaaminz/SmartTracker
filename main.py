@@ -1,14 +1,15 @@
 # 1%  
 from CameraInterface import *  
-from Processing import ObjectTrackerYOLO
+from Processing import ObjectTracker
 from threading import Thread
 
 RUN = True  
 
 if __name__ == '__main__':        
     cameraInterface1 = CameraInterface(0)  
-    objectTrackerYOLO = ObjectTrackerYOLO() 
-    def onFrameReceive(frame) :  
+    objectTracker = ObjectTracker() 
+    def onFrameReceive(frame) :   
+        frame = objectTracker.frameProcessing(frame)
         cv2.imshow("main" , frame)  
 
     def commandLineSystem() :  
