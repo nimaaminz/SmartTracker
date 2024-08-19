@@ -13,7 +13,7 @@ class ObjectTracker  :
 
     def frameProcessing(self , frame) : 
         self.model.to(self.device)
-        # frame = [frame]
+
         results = self.model(frame) 
         labels, cord = results.xyxyn[0][:, -1].cpu().numpy(), results.xyxyn[0][:, :-1].cpu().numpy()
 

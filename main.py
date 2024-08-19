@@ -4,22 +4,27 @@ from Processing import ObjectTracker , LaneDetection
 from threading import Thread
 
 RUN = True  
+OBJECT_DETECTION_PROCESS_ACTIVATION = True  
 
 if __name__ == '__main__':        
+
     cameraInterface1 = CameraInterface(0)  
     objectTracker = ObjectTracker()  
     laneDetection = LaneDetection()
 
     def onFrameReceive(frame) :   
-        _frame = objectTracker.frameProcessing(frame) 
-        processedFrame = laneDetection.onFrame(frame)  
+        global OBJECT_DETECTION_PROCESS_ACTIVATION
+        _frame = frame 
+        if OBJECT_DETECTION_PROCESS_ACTIVATION : 
+            frame = objectTracker.frameProcessing(frame) 
+        processedFrame = laneDetection.onFrame(_frame)   
         cv2.imshow("Perspective" , processedFrame['perspective'])  
         cv2.imshow("appliedRange" , processedFrame['appliedRange'])   
         cv2.imshow("slideWindows" , processedFrame['slideWindows'])   
-        cv2.imshow("main" , _frame)  
+        cv2.imshow("main" , frame)  
 
     def commandLineSystem() :  
-
+        global OBJECT_DETECTION_PROCESS_ACTIVATION
         def isNumeric(s : str) : 
             if s.startswith('-'):
                 s = s[1:] 
@@ -100,9 +105,19 @@ if __name__ == '__main__':
                                     print("unknown command") 
                                     
                     pass # CAMERA PROPERTIES 
+                case "detection":  
+                    value = input('value * 1|0 : ').strip()
+                    if isNumeric(value) == False: 
+                        print("Invalid input")
+                    else :  
+                      OBJECT_DETECTION_PROCESS_ACTIVATION = bool(int(value))
+                    pass    
                 case "?" : 
-                    print("""
-                            not for now
+                    print(f"""
+                        Available commands:
+                        ------------------------------------------------------------------------------------------
+                        cam props: Adjust camera properties (brightness, contrast, saturation, hue, exposure, fps)
+                        detection: Enable or disable object detection (1 to enable, 0 to disable)
                           """)
                 case _ : 
                     if len(cmd) > 0 : 
