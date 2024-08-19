@@ -1,16 +1,22 @@
 # 1%  
 from CameraInterface import *  
-from Processing import ObjectTracker
+from Processing import ObjectTracker , LaneDetection
 from threading import Thread
 
 RUN = True  
 
 if __name__ == '__main__':        
     cameraInterface1 = CameraInterface(0)  
-    objectTracker = ObjectTracker() 
+    objectTracker = ObjectTracker()  
+    laneDetection = LaneDetection()
+
     def onFrameReceive(frame) :   
-        frame = objectTracker.frameProcessing(frame)
-        cv2.imshow("main" , frame)  
+        _frame = objectTracker.frameProcessing(frame) 
+        processedFrame = laneDetection.onFrame(frame)  
+        cv2.imshow("Perspective" , processedFrame['perspective'])  
+        cv2.imshow("appliedRange" , processedFrame['appliedRange'])   
+        cv2.imshow("slideWindows" , processedFrame['slideWindows'])   
+        cv2.imshow("main" , _frame)  
 
     def commandLineSystem() :  
 
