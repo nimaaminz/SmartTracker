@@ -1,10 +1,11 @@
-# 1%  
+# 1% | nimaaminz
 from CameraInterface import *  
 from Processing import ObjectTracker , LaneDetection
 from threading import Thread
 
 RUN = True  
 OBJECT_DETECTION_PROCESS_ACTIVATION = True  
+LANE_DETECTION_PROCESS_ACTIVATION = True  
 
 if __name__ == '__main__':        
 
@@ -14,26 +15,30 @@ if __name__ == '__main__':
 
     def onFrameReceive(frame) :   
         global OBJECT_DETECTION_PROCESS_ACTIVATION
+        global LANE_DETECTION_PROCESS_ACTIVATION
+
         _frame = frame 
         if OBJECT_DETECTION_PROCESS_ACTIVATION : 
-            frame = objectTracker.frameProcessing(frame) 
-        processedFrame = laneDetection.onFrame(_frame)   
-        cv2.imshow("Perspective" , processedFrame['perspective'])  
-        cv2.imshow("appliedRange" , processedFrame['appliedRange'])   
-        cv2.imshow("slideWindows" , processedFrame['slideWindows'])   
+            frame = objectTracker.frameProcessing(frame)  
+        if LANE_DETECTION_PROCESS_ACTIVATION : 
+            processedFrame = laneDetection.onFrame(_frame)   
+            cv2.imshow("Perspective" , processedFrame['perspective'])  
+            cv2.imshow("appliedRange" , processedFrame['appliedRange'])   
+            cv2.imshow("slideWindows" , processedFrame['slideWindows'])
+
+        # original frame #
         cv2.imshow("main" , frame)  
 
     def commandLineSystem() :  
-        global OBJECT_DETECTION_PROCESS_ACTIVATION
-        def isNumeric(s : str) : 
-            if s.startswith('-'):
-                s = s[1:] 
-            return s.isdigit()
         
-
-        commandLineLock = False  
-        while RUN and commandLineLock == False : 
-            
+        global OBJECT_DETECTION_PROCESS_ACTIVATION
+        global LANE_DETECTION_PROCESS_ACTIVATION
+        
+        def isNumeric(s : str) : 
+            if s.startswith('-'): s = s[1:] 
+            return s.isdigit()
+    
+        while RUN : 
             cmd = input(">>").strip()
             match cmd :  
                 case "cam props" :  
@@ -105,19 +110,26 @@ if __name__ == '__main__':
                                     print("unknown command") 
                                     
                     pass # CAMERA PROPERTIES 
-                case "detection":  
+                case "detection obj":  
                     value = input('value * 1|0 : ').strip()
                     if isNumeric(value) == False: 
                         print("Invalid input")
                     else :  
                       OBJECT_DETECTION_PROCESS_ACTIVATION = bool(int(value))
                     pass    
+                case "detection lane":  
+                    value = input('value * 1|0 : ').strip()
+                    if isNumeric(value) == False: 
+                        print("Invalid input")
+                    else :  
+                      LANE_DETECTION_PROCESS_ACTIVATION = bool(int(value))
+                    pass    
                 case "?" : 
                     print(f"""
                         Available commands:
                         ------------------------------------------------------------------------------------------
                         cam props: Adjust camera properties (brightness, contrast, saturation, hue, exposure, fps)
-                        detection: Enable or disable object detection (1 to enable, 0 to disable)
+                        detection: lane , obj | Enable or disable object detection (1 to enable, 0 to disable)
                           """)
                 case _ : 
                     if len(cmd) > 0 : 
@@ -131,3 +143,7 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
 
     pass 
+
+
+
+# game over
